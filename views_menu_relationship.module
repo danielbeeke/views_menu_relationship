@@ -38,3 +38,18 @@ function views_menu_relationship_views_data() {
 
   return $data;
 }
+
+
+/**
+ * Implements hook_entity_update().
+ */
+function views_menu_relationship_entity_update(Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'menu_link_content') {
+    $uri = $entity->link->uri;
+    if ($uri && substr($uri, 0, 7) == 'entity:') {
+      $uri_exploded = explode(':', $uri);
+      $entity_info = explode('/', $uri_exploded[1]);
+      Cache::invalidateTags([$entity_info[0] . ':' . $entity_info[1]]);
+    }
+  }
+}
